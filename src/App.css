@@ -5,6 +5,8 @@
 html,
 body {
   overflow-x: hidden;
+  background-color: #000814;
+  color: #f9fafb;
 }
 
 /* ===== Scrollbar CSS ===== */

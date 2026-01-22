@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { FiUploadCloud } from "react-icons/fi"
-import { useSelector } from "react-redux"
 
 import "video-react/dist/video-react.css"
 import { Player } from "video-react"
@@ -16,12 +15,10 @@ export default function Upload({
   viewData = null,
   editData = null,
 }) {
-  const { course } = useSelector((state) => state.course)
   const [selectedFile, setSelectedFile] = useState(null)
   const [previewSource, setPreviewSource] = useState(
     viewData ? viewData : editData ? editData : ""
   )
-  const inputRef = useRef(null)
 
   const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0]
@@ -37,10 +34,6 @@ export default function Upload({
       ? { "image/*": [".jpeg", ".jpg", ".png"] }
       : { "video/*": [".mp4"] },
     onDrop,
-    // We trigger the hidden input manually, so disable the
-    // library's default click/keyboard behavior.
-    noClick: true,
-    noKeyboard: true,
   })
 
   const previewFile = (file) => {
@@ -69,20 +62,14 @@ export default function Upload({
         {label} {!viewData && <sup className="text-pink-200">*</sup>}
       </label>
       <div
-        {...getRootProps({
-          onClick: () => {
-            if (inputRef.current) {
-              inputRef.current.click()
-            }
-          },
-        })}
+        {...getRootProps()}
         tabIndex={0}
         role="button"
         className={`${
           isDragActive ? "bg-richblack-600" : "bg-richblack-700"
         } flex min-h-[250px] cursor-pointer items-center justify-center rounded-md border-2 border-dotted border-richblack-500`}
       >
-        <input {...getInputProps()} ref={inputRef} />
+        <input {...getInputProps()} />
         {previewSource ? (
           <div className="flex w-full flex-col p-6">
             {!video ? (
