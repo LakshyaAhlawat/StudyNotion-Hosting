@@ -28,10 +28,34 @@ exports.createCategory = async (req, res) => {
   }
 }
 
+// Get all categories. If none exist (fresh database), seed a few sensible defaults
+// so that the course creation flow always has options.
 exports.showAllCategories = async (req, res) => {
   try {
-    const allCategorys = await Category.find()
-    res.status(200).json({
+    let allCategorys = await Category.find()
+
+    // Seed default categories on a fresh database so instructors always
+    // see some options in the "Course Category" dropdown.
+    if (allCategorys.length === 0) {
+      const defaultCategories = [
+        {
+          name: "Web Development",
+          description: "Courses related to building websites and web applications.",
+        },
+        {
+          name: "Programming Fundamentals",
+          description: "Core concepts of programming and problem solving.",
+        },
+        {
+          name: "Data Structures & Algorithms",
+          description: "Courses focused on DSA and coding interviews.",
+        },
+      ]
+
+      allCategorys = await Category.insertMany(defaultCategories)
+    }
+
+    return res.status(200).json({
       success: true,
       data: allCategorys,
     })
@@ -64,28 +88,31 @@ exports.categoryPageDetails = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Category not found" })
     }
-    // Handle the case when there are no courses
+    // If there are no courses in this category yet, log and continue.
+    // The frontend will simply render an empty course list instead of failing.
     if (selectedCategory.courses.length === 0) {
-      console.log("No courses found for the selected category.")
-      return res.status(404).json({
-        success: false,
-        message: "No courses found for the selected category.",
-      })
+      console.log("No courses found for the selected category. Returning empty list.")
     }
 
-    // Get courses for other categories
+    // Get courses for other categories (if any exist)
     const categoriesExceptSelected = await Category.find({
       _id: { $ne: categoryId },
     })
-    let differentCategory = await Category.findOne(
-      categoriesExceptSelected[getRandomInt(categoriesExceptSelected.length)]
-        ._id
-    )
-      .populate({
-        path: "courses",
-        match: { status: "Published" },
-      })
-      .exec()
+
+    let differentCategory = null
+    if (categoriesExceptSelected.length > 0) {
+      const randomCategory =
+        categoriesExceptSelected[getRandomInt(categoriesExceptSelected.length)]
+
+      if (randomCategory) {
+        differentCategory = await Category.findById(randomCategory._id)
+          .populate({
+            path: "courses",
+            match: { status: "Published" },
+          })
+          .exec()
+      }
+    }
     console.log()
     // Get top-selling courses across all categories
     const allCategories = await Category.find()

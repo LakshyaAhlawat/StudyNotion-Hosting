@@ -19,8 +19,8 @@ export default function SidebarLink({ link, iconName }) {
       onClick={() => dispatch(resetCourseState())}
       className={`relative px-8 py-2 text-sm font-medium ${
         matchRoute(link.path)
-          ? "bg-yellow-800 text-yellow-50"
-          : "bg-opacity-0 text-richblack-300"
+          ? "bg-yellow-800/90 text-yellow-50 shadow-[0_0_0_1px_rgba(250,204,21,0.35)]"
+          : "bg-transparent text-richblack-300 hover:bg-richblack-700/60 hover:text-richblack-25"
       } transition-all duration-200`}
     >
       <span

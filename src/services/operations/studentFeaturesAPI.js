@@ -37,6 +37,29 @@ export async function BuyCourse(
 ) {
   const toastId = toast.loading("Loading...")
   try {
+    // In local/dev mode we can bypass Razorpay entirely and
+    // let the backend enroll the student directly.
+    // This is enabled if REACT_APP_FAKE_PAYMENT is true OR
+    // no Razorpay key is configured for the frontend.
+    if (
+      process.env.REACT_APP_FAKE_PAYMENT === "true" ||
+      !process.env.RAZORPAY_KEY
+    ) {
+      await verifyPayment(
+        {
+          razorpay_order_id: "dev_order_id",
+          razorpay_payment_id: "dev_payment_id",
+          razorpay_signature: "dev_signature",
+          courses,
+        },
+        token,
+        navigate,
+        dispatch
+      )
+      toast.dismiss(toastId)
+      return
+    }
+
     // Loading the script of Razorpay SDK
     const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js")
 

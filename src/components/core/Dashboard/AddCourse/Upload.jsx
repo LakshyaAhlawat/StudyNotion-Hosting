@@ -37,6 +37,10 @@ export default function Upload({
       ? { "image/*": [".jpeg", ".jpg", ".png"] }
       : { "video/*": [".mp4"] },
     onDrop,
+    // We trigger the hidden input manually, so disable the
+    // library's default click/keyboard behavior.
+    noClick: true,
+    noKeyboard: true,
   })
 
   const previewFile = (file) => {
@@ -68,6 +72,11 @@ export default function Upload({
         {...getRootProps()}
         tabIndex={0}
         role="button"
+        onClick={() => {
+          if (inputRef.current) {
+            inputRef.current.click()
+          }
+        }}
         className={`${
           isDragActive ? "bg-richblack-600" : "bg-richblack-700"
         } flex min-h-[250px] cursor-pointer items-center justify-center rounded-md border-2 border-dotted border-richblack-500`}

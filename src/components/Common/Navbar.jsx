@@ -60,8 +60,10 @@ function Navbar() {
 
   return (
     <div
-      className={`flex h-14 items-center justify-center border-b-[1px] border-b-richblack-700 ${
-        location.pathname !== "/" ? "bg-richblack-800" : ""
+      className={`sticky top-0 z-50 flex h-14 items-center justify-center border-b-[1px] border-b-richblack-700 ${
+        location.pathname === "/"
+          ? "bg-richblack-900/40 backdrop-blur"
+          : "bg-richblack-900/80 backdrop-blur"
       } transition-all duration-200`}
     >
       <div className="flex w-11/12 max-w-maxContent items-center justify-between">

@@ -11,6 +11,9 @@ const { paymentSuccessEmail } = require("../mail/templates/paymentSuccessEmail")
 const CourseProgress = require("../models/CourseProgress")
 
 // Capture the payment and initiate the Razorpay order
+// If SKIP_PAYMENT_VERIFICATION is enabled (dev/local mode), we do not
+// call Razorpay at all and instead return a fake order payload so that
+// the usual frontend flow can continue.
 exports.capturePayment = async (req, res) => {
   const { courses } = req.body
   const userId = req.user.id
@@ -55,6 +58,23 @@ exports.capturePayment = async (req, res) => {
     receipt: Math.random(Date.now()).toString(),
   }
 
+  // Dev-mode shortcut: allow local testing without real Razorpay keys
+  // Enabled when SKIP_PAYMENT_VERIFICATION is true OR when
+  // no Razorpay key is configured.
+  if (
+    process.env.SKIP_PAYMENT_VERIFICATION === "true" ||
+    !process.env.RAZORPAY_KEY
+  ) {
+    return res.json({
+      success: true,
+      data: {
+        id: "dev_order_id",
+        amount: options.amount,
+        currency: options.currency,
+      },
+    })
+  }
+
   try {
     // Initiate the payment using Razorpay
     const paymentResponse = await instance.orders.create(options)
@@ -79,6 +99,21 @@ exports.verifyPayment = async (req, res) => {
   const courses = req.body?.courses
 
   const userId = req.user.id
+
+  // Dev-mode: if we are explicitly configured to skip verification,
+  // missing Razorpay secrets, OR we receive the special dev IDs from
+  // the frontend, bypass signature checks and enroll directly.
+  if (
+    process.env.SKIP_PAYMENT_VERIFICATION === "true" ||
+    !process.env.RAZORPAY_SECRET ||
+    razorpay_order_id === "dev_order_id" ||
+    razorpay_payment_id === "dev_payment_id"
+  ) {
+    await enrollStudents(courses, userId, res)
+    return res
+      .status(200)
+      .json({ success: true, message: "Payment Verified (dev mode)" })
+  }
 
   if (
     !razorpay_order_id ||

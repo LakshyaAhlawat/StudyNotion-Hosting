@@ -116,13 +116,18 @@ exports.getAllRatingReview = async (req, res) => {
       })
       .populate({
         path: "course",
-        select: "courseName", //Specify the fields you want to populate from the "Course" model
+        select: "courseName status", //Specify the fields you want to populate from the "Course" model
       })
       .exec()
 
+    // Filter out reviews whose course has been deleted or is not published
+    const filteredReviews = allReviews.filter(
+      (review) => review.course && review.course.status === "Published"
+    )
+
     res.status(200).json({
       success: true,
-      data: allReviews,
+      data: filteredReviews,
     })
   } catch (error) {
     console.error(error)

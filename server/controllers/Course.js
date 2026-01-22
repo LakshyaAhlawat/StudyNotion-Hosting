@@ -2,6 +2,7 @@ const Course = require("../models/Course")
 const Category = require("../models/Category")
 const Section = require("../models/Section")
 const SubSection = require("../models/Subsection")
+const RatingAndReview = require("../models/RatingandReview")
 const User = require("../models/User")
 const { uploadImageToCloudinary } = require("../utils/imageUploader")
 const CourseProgress = require("../models/CourseProgress")
@@ -206,7 +207,10 @@ exports.getAllCourses = async (req, res) => {
         thumbnail: true,
         instructor: true,
         ratingAndReviews: true,
-        studentsEnrolled: true,
+        // NOTE: the field in the schema is `studentsEnroled`
+        // (with a single "l"), so project that here to make
+        // sure the client receives the correct data.
+        studentsEnroled: true,
       }
     )
       .populate("instructor")
@@ -413,21 +417,28 @@ exports.getFullCourseDetails = async (req, res) => {
 // Get a list of Course for a given Instructor
 exports.getInstructorCourses = async (req, res) => {
   try {
-    // Get the instructor ID from the authenticated user or request body
+    // Get the instructor ID from the authenticated user
     const instructorId = req.user.id
+    console.log("Fetching courses for instructor:", instructorId)
 
     // Find all courses belonging to the instructor
     const instructorCourses = await Course.find({
       instructor: instructorId,
-    }).sort({ createdAt: -1 })
+    })
+    .populate("category", "name")
+    .populate("studentsEnroled", "firstName lastName email")
+    .sort({ createdAt: -1 })
+
+    console.log("Found courses:", instructorCourses.length)
 
     // Return the instructor's courses
     res.status(200).json({
       success: true,
       data: instructorCourses,
+      message: `Found ${instructorCourses.length} courses`
     })
   } catch (error) {
-    console.error(error)
+    console.error("Error in getInstructorCourses:", error)
     res.status(500).json({
       success: false,
       message: "Failed to retrieve instructor courses",
@@ -469,6 +480,9 @@ exports.deleteCourse = async (req, res) => {
       // Delete the section
       await Section.findByIdAndDelete(sectionId)
     }
+
+    // Delete all ratings/reviews associated with this course
+    await RatingAndReview.deleteMany({ course: courseId })
 
     // Delete the course
     await Course.findByIdAndDelete(courseId)
