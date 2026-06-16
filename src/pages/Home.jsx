@@ -20,6 +20,9 @@ function Home() {
     <div>
       {/* Section 1 */}
       <div className="relative mx-auto flex w-11/12 max-w-maxContent flex-col items-center justify-between gap-8 text-white">
+        {/* Background Decorative Gradients */}
+        <div className="pointer-events-none absolute top-[10%] left-[5%] h-80 w-80 rounded-full bg-yellow-50/10 blur-[100px] animate-float" />
+        <div className="pointer-events-none absolute top-[30%] right-[5%] h-[400px] w-[400px] rounded-full bg-blue-200/10 blur-[120px] animate-float" style={{ animationDelay: '2s' }} />
         {/* Become a Instructor Button */}
         <Link to={"/signup"}>
           <div className="group mx-auto mt-16 w-fit rounded-full bg-richblack-800 p-1 font-bold text-richblack-200 drop-shadow-[0_1.5px_rgba(255,255,255,0.25)] transition-all duration-200 hover:scale-95 hover:drop-shadow-none glassmorphism-dark hover-glow">
@@ -31,13 +34,12 @@ function Home() {
         </Link>
 
         {/* Heading */}
-        <div className="text-center text-4xl font-semibold">
-          Empower Your Future with
+        <div className="text-center text-5xl md:text-6xl font-bold mt-8 tracking-tight">
+          Empower Your Future with <br />
           <HighlightText text={"Coding Skills"} />
         </div>
 
-        {/* Sub Heading */}
-        <div className="-mt-3 w-[90%] text-center text-lg font-bold text-richblack-300">
+        <div className="-mt-1 w-[80%] text-center text-lg text-richblack-200 leading-relaxed">
           With our online coding courses, you can learn at your own pace, from
           anywhere in the world, and get access to a wealth of resources,
           including hands-on projects, quizzes, and personalized feedback from
@@ -55,15 +57,19 @@ function Home() {
         </div>
 
         {/* Video */}
-        <div className="mx-3 my-7 shadow-[10px_-5px_50px_-5px] shadow-blue-200 hover-glow transition-all duration-500 rounded-lg overflow-hidden glassmorphism-dark p-2">
-          <video
-            className="shadow-[20px_20px_rgba(255,255,255)] rounded-md"
-            muted
-            loop
-            autoPlay
-          >
-            <source src={Banner} type="video/mp4" />
-          </video>
+        <div className="relative mx-3 my-12 group">
+          {/* Animated Glow Behind Video */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-yellow-50 via-blue-200 to-yellow-50 rounded-xl blur-lg opacity-40 group-hover:opacity-70 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+          <div className="relative shadow-2xl rounded-xl overflow-hidden glassmorphism-dark p-2 transition-all duration-500 hover:scale-[1.02]">
+            <video
+              className="rounded-lg w-full h-full object-cover"
+              muted
+              loop
+              autoPlay
+            >
+              <source src={Banner} type="video/mp4" />
+            </video>
+          </div>
         </div>
 
         {/* Code Section 1  */}
@@ -182,7 +188,7 @@ function Home() {
         <InstructorSection />
 
         {/* Reviws from Other Learner */}
-        <h1 className="text-center text-4xl font-semibold mt-8">
+        <h1 className="text-center text-4xl font-bold mt-8">
           Reviews from other learners
         </h1>
         <ReviewSlider />
