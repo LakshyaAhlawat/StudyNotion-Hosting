@@ -14,10 +14,12 @@ import Cart from "./components/core/Dashboard/Cart"
 import EditCourse from "./components/core/Dashboard/EditCourse"
 import EnrolledCourses from "./components/core/Dashboard/EnrolledCourses"
 import Instructor from "./components/core/Dashboard/Instructor"
+import AdminDashboard from "./components/core/Dashboard/AdminDashboard"
 import MyCourses from "./components/core/Dashboard/MyCourses"
 import MyProfile from "./components/core/Dashboard/MyProfile"
 import Settings from "./components/core/Dashboard/Settings"
 import VideoDetails from "./components/core/ViewCourse/VideoDetails"
+import AIChatbot from "./components/core/AI/AIChatbot"
 import About from "./pages/About"
 import Catalog from "./pages/Catalog"
 import Contact from "./pages/Contact"
@@ -122,6 +124,12 @@ function App() {
               />
             </>
           )}
+          {/* Route only for Admins */}
+          {user?.accountType === ACCOUNT_TYPE.ADMIN && (
+            <>
+              <Route path="dashboard/admin" element={<AdminDashboard />} />
+            </>
+          )}
           {/* Route only for Students */}
           {user?.accountType === ACCOUNT_TYPE.STUDENT && (
             <>
@@ -156,6 +164,9 @@ function App() {
         {/* 404 Page */}
         <Route path="*" element={<Error />} />
       </Routes>
+      
+      {/* Global AI Chatbot available everywhere */}
+      <AIChatbot />
     </div>
   )
 }

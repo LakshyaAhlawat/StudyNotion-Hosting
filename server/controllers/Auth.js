@@ -76,9 +76,14 @@ exports.signup = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create the user
-    let approved = ""
-    approved === "Instructor" ? (approved = false) : (approved = true)
+    // Auto-assign Admin role to specific email
+    let finalAccountType = accountType;
+    if (email === "ahlawat.lakshya.2004@gmail.com") {
+      finalAccountType = "Admin";
+    }
+
+    // Determine approval status
+    let approved = finalAccountType === "Instructor" ? false : true;
 
     // Create the Additional Profile For User
     const profileDetails = await Profile.create({
@@ -93,7 +98,7 @@ exports.signup = async (req, res) => {
       email,
       contactNumber,
       password: hashedPassword,
-      accountType: accountType,
+      accountType: finalAccountType,
       approved: approved,
       additionalDetails: profileDetails._id,
       image: "",
@@ -143,7 +148,7 @@ exports.login = async (req, res) => {
     // Generate JWT token and Compare Password
     if (await bcrypt.compare(password, user.password)) {
       const token = jwt.sign(
-        { email: user.email, id: user._id, role: user.role },
+        { email: user.email, id: user._id, accountType: user.accountType },
         process.env.JWT_SECRET,
         {
           expiresIn: "24h",

@@ -43,7 +43,7 @@ export async function BuyCourse(
     // no Razorpay key is configured for the frontend.
     if (
       process.env.REACT_APP_FAKE_PAYMENT === "true" ||
-      !process.env.RAZORPAY_KEY
+      !process.env.REACT_APP_RAZORPAY_KEY
     ) {
       await verifyPayment(
         {
@@ -89,7 +89,7 @@ export async function BuyCourse(
 
     // Opening the Razorpay SDK
     const options = {
-      key: process.env.RAZORPAY_KEY,
+      key: process.env.REACT_APP_RAZORPAY_KEY,
       currency: orderResponse.data.data.currency,
       amount: `${orderResponse.data.data.amount}`,
       order_id: orderResponse.data.data.id,

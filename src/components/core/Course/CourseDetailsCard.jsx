@@ -56,7 +56,7 @@ function CourseDetailsCard({ course, setConfirmationModal, handleBuyCourse }) {
   return (
     <>
       <div
-        className={`flex flex-col gap-4 rounded-md bg-richblack-700 p-4 text-richblack-5`}
+        className={`flex flex-col gap-4 rounded-md bg-richblack-700 p-4 text-richblack-5 glassmorphism-dark hover-glow`}
       >
         {/* Course Image */}
         <img

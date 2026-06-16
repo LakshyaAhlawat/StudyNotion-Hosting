@@ -38,6 +38,7 @@ function Navbar() {
 
   const [subLinks, setSubLinks] = useState([])
   const [loading, setLoading] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   useEffect(() => {
     ;(async () => {
@@ -52,6 +53,11 @@ function Navbar() {
     })()
   }, [])
 
+  useEffect(() => {
+    // Close mobile menu on route change
+    setIsMenuOpen(false)
+  }, [location.pathname])
+
   // console.log("sub links", subLinks)
 
   const matchRoute = (route) => {
@@ -60,11 +66,11 @@ function Navbar() {
 
   return (
     <div
-      className={`sticky top-0 z-50 flex h-14 items-center justify-center border-b-[1px] border-b-richblack-700 ${
+      className={`sticky top-0 z-50 flex h-14 items-center justify-center border-b-[1px] border-b-richblack-700/50 ${
         location.pathname === "/"
-          ? "bg-richblack-900/40 backdrop-blur"
-          : "bg-richblack-900/80 backdrop-blur"
-      } transition-all duration-200`}
+          ? "glassmorphism-dark"
+          : "glassmorphism-dark"
+      } transition-all duration-300`}
     >
       <div className="flex w-11/12 max-w-maxContent items-center justify-between">
         {/* Logo */}
@@ -94,11 +100,6 @@ function Navbar() {
                         ) : subLinks && Array.isArray(subLinks) && subLinks.length > 0 ? (
                           <>
                             {subLinks
-                              .filter(
-                                (subLink) =>
-                                  Array.isArray(subLink?.courses) &&
-                                  subLink.courses.length > 0
-                              )
                               .map((subLink, i) => (
                                 <Link
                                   to={`/catalog/${subLink.name
@@ -121,10 +122,10 @@ function Navbar() {
                 ) : (
                   <Link to={link?.path}>
                     <p
-                      className={`${
+                      className={`transition-all duration-200 ${
                         matchRoute(link?.path)
                           ? "text-yellow-25"
-                          : "text-richblack-25"
+                          : "text-richblack-25 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
                       }`}
                     >
                       {link.title}
@@ -135,7 +136,7 @@ function Navbar() {
             ))}
           </ul>
         </nav>
-        {/* Login / Signup / Dashboard */}
+        {/* Login / Signup / Dashboard - Desktop */}
         <div className="hidden items-center gap-x-4 md:flex">
           {user && user?.accountType !== ACCOUNT_TYPE.INSTRUCTOR && (
             <Link to="/dashboard/cart" className="relative">
@@ -163,10 +164,117 @@ function Navbar() {
           )}
           {token !== null && <ProfileDropdown />}
         </div>
-        <button className="mr-4 md:hidden">
+        {/* Mobile menu toggle */}
+        <button
+          className="mr-2 rounded-md p-2 md:hidden"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          aria-label="Toggle navigation menu"
+        >
           <AiOutlineMenu fontSize={24} fill="#AFB2BF" />
         </button>
       </div>
+      {/* Mobile Navigation Drawer */}
+      {isMenuOpen && (
+        <div className="absolute left-0 top-14 z-40 w-full border-b border-richblack-700 bg-richblack-900 px-6 py-4 md:hidden">
+          <nav>
+            <ul className="flex flex-col gap-3 text-richblack-25">
+              {NavbarLinks.map((link, index) => (
+                <li key={index}>
+                  {link.title === "Catalog" ? (
+                    <div>
+                      <p className="mb-1 text-sm font-semibold text-richblack-200">
+                        {link.title}
+                      </p>
+                      <div className="flex flex-col gap-1 pl-2">
+                        {loading ? (
+                          <p className="text-sm text-richblack-200">
+                            Loading...
+                          </p>
+                        ) : subLinks && Array.isArray(subLinks) && subLinks.length > 0 ? (
+                          subLinks
+                            .map((subLink, i) => (
+                              <Link
+                                to={`/catalog/${subLink.name
+                                  .split(" ")
+                                  .join("-")
+                                  .toLowerCase()}`}
+                                className="rounded-md py-2 text-sm hover:text-yellow-25"
+                                key={i}
+                              >
+                                {subLink.name}
+                              </Link>
+                            ))
+                        ) : (
+                          <p className="text-sm text-richblack-200">
+                            No Courses Found
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <Link
+                      to={link?.path}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <p
+                        className={`text-sm ${
+                          matchRoute(link?.path)
+                            ? "text-yellow-25"
+                            : "text-richblack-25"
+                        }`}
+                      >
+                        {link.title}
+                      </p>
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="mt-4 flex flex-col gap-3">
+            {user && user?.accountType !== ACCOUNT_TYPE.INSTRUCTOR && (
+              <Link
+                to="/dashboard/cart"
+                className="flex items-center gap-2 text-sm text-richblack-25"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <AiOutlineShoppingCart className="text-lg" />
+                <span>Cart{totalItems > 0 ? ` (${totalItems})` : ""}</span>
+              </Link>
+            )}
+
+            {token === null && (
+              <div className="flex gap-3">
+                <Link
+                  to="/login"
+                  className="flex-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <button className="w-full rounded-[8px] border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-sm text-richblack-100">
+                    Log in
+                  </button>
+                </Link>
+                <Link
+                  to="/signup"
+                  className="flex-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <button className="w-full rounded-[8px] border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-sm text-richblack-100">
+                    Sign up
+                  </button>
+                </Link>
+              </div>
+            )}
+
+            {token !== null && (
+              <div className="pt-2">
+                <ProfileDropdown />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
