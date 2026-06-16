@@ -46,7 +46,7 @@ exports.summarizeCourse = async (description, whatYouWillLearn) => {
         try {
             const chatCompletion = await groqAi.chat.completions.create({
                 messages: [{ role: 'user', content: prompt }],
-                model: 'llama3-8b-8192',
+                model: 'llama-3.1-8b-instant',
             });
             return chatCompletion.choices[0]?.message?.content || "";
         } catch (error) {
@@ -82,7 +82,7 @@ exports.chatWithAssistant = async (message, courseContext) => {
         try {
             const chatCompletion = await groqAi.chat.completions.create({
                 messages: [{ role: 'user', content: prompt }],
-                model: 'llama3-8b-8192',
+                model: 'llama-3.1-8b-instant',
             });
             return chatCompletion.choices[0]?.message?.content || "";
         } catch (error) {
