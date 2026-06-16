@@ -21,9 +21,10 @@ const AIChatbot = ({ courseId }) => {
     setLoading(true);
 
     try {
+        const BASE_URL = process.env.REACT_APP_BASE_URL;
         const response = await apiConnector(
             "POST",
-            "/api/v1/ai/chat",
+            `${BASE_URL}/ai/chat`,
             { message: userMessage.text, courseId },
             { Authorization: `Bearer ${token}` }
         );
